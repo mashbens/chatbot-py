@@ -6,20 +6,21 @@ from PyPDF2 import PdfReader
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
-PDF_PATH = "/home/bens/project/mygit/chatbot-py/docs/BUMN.pdf"
+PDF_PATH_BUMN = "/home/bens/project/mygit/chatbot-py/docs/BUMN.pdf"
+PDF_PATH_BRI_PRODUK = "/home/bens/project/mygit/chatbot-py/docs/BRI_PRODUK.pdf"
 OLLAMA_URL = "http://localhost:11435/api/generate"
 
 # Ekstrak teks dari PDF berdasarkan modul
-def extract_text_by_module(pdf_path, module_name):
+def extract_text_by_module(pdf_path, module_name, keyword):
     reader = PdfReader(pdf_path)
     
     for page_number, page in enumerate(reader.pages):
         page_text = page.extract_text()
-        if page_text and module_name in page_text:
-            logging.info(f"Modul '{module_name}' ditemukan di halaman {page_number + 1}")
+        if page_text and keyword in page_text:
+            logging.info(f"Modul '{keyword}' ditemukan di halaman {page_number + 1}")
             return page_text  # Langsung return saat modul ditemukan
     
-    logging.warning(f"Modul '{module_name}' tidak ditemukan dalam dokumen.")
+    logging.warning(f"Modul '{module_name}' atau kata kunci '{keyword}' tidak ditemukan dalam dokumen.")
     return None
 
 # Query Ollama
@@ -40,13 +41,20 @@ def ask():
     data = request.json
     user_question = data.get("question")
     module_name = data.get("module")
-    
+    keyword = data.get("module")
+
+
     if not user_question or not module_name:
         return jsonify({"error": "Pertanyaan dan modul harus disediakan"}), 400
 
-    pdf_text = extract_text_by_module(PDF_PATH, module_name)
+
+    if module_name == "BRI_PRODUK":
+        pdf_text = extract_text_by_module(PDF_PATH_BRI_PRODUK, module_name, keyword)
+    elif module_name == "BUMN":
+        pdf_text = extract_text_by_module(PDF_PATH_BUMN, module_name, keyword)
+
     if not pdf_text:
-        return jsonify({"error": f"Modul {module_name} tidak ditemukan"}), 404
+        return jsonify({"error": f"Modul {module_name} or kata kunci {keyword} tidak ditemukan"}), 404
 
     combined_prompt = f"""
     Berikut adalah konten dari {module_name}:
@@ -54,7 +62,7 @@ def ask():
     
     Pertanyaan: {user_question}
     """
-    
+    print("combined_prompt>>>",combined_prompt)
     response = query_ollama(combined_prompt)
     return jsonify(response)
 
