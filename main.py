@@ -7,7 +7,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 PDF_PATH = "/home/bens/project/mygit/chatbot-py/docs/BUMN.pdf"
-OLLAMA_URL = "http://localhost:11435/api/generate"
+OLLAMA_URL = "http://10.60.2.15:31130/api/generate"
 
 # Ekstrak teks dari PDF berdasarkan modul
 def extract_text_by_module(pdf_path, module_name):
@@ -24,8 +24,9 @@ def extract_text_by_module(pdf_path, module_name):
 
 # Query Ollama
 def query_ollama(prompt):
-    payload = {"model": "llama3.2:3b", "prompt": prompt.replace("\n", "\\n"), "stream": False}
-    
+    cleaned_string = prompt.replace('\n', '')
+    payload = {"model": "gemma3:4b", "prompt": cleaned_string, "stream": False}
+    print("payload>>>",payload)
     with requests.Session() as session:
         try:
             response = session.post(OLLAMA_URL, json=payload)
@@ -52,6 +53,8 @@ def ask():
     Berikut adalah konten dari {module_name}:
     {pdf_text}
     
+    Jawab pertanyaan ini berdasarkan konten di atas
+
     Pertanyaan: {user_question}
     """
     

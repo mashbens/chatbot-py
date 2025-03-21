@@ -60,6 +60,7 @@ def ask():
     Berikut adalah konten dari {module_name}:
     {pdf_text}
     
+    Jawab hanya berdasarkan modul tersebut, Jika tidak ada jawaban di modul tersebut, jawab "Maaf ya Kakak, aku hanya bisa menjawab seputar modul BUMN dan BRI PRODUK".
     Pertanyaan: {user_question}
     """
     print("combined_prompt>>>",combined_prompt)
