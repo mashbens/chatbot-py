@@ -6,7 +6,7 @@ from PyPDF2 import PdfReader
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
-PDF_PATH = "/home/bens/project/mygit/chatbot-py/docs/BUMN.pdf"
+PDF_PATH = "/home/bens/project/mygit/chatbot-py/docs/PPM.pdf"
 OLLAMA_URL = "http://10.60.2.15:31130/api/generate"
 
 # Ekstrak teks dari PDF berdasarkan modul
@@ -31,13 +31,18 @@ def query_ollama(prompt):
         try:
             response = session.post(OLLAMA_URL, json=payload)
             response.raise_for_status()
-            return response.json()
+            response_data = response.json()
+            # return response.json()
+            filtered_data = {key: value for key, value in response_data.items() if key != "context"}
+            return filtered_data
+        
         except requests.RequestException as e:
             logging.error(f"Error querying Ollama: {e}")
             return {"error": str(e)}
 
 @app.route("/ask", methods=["POST"])
 def ask():
+
     data = request.json
     user_question = data.get("question")
     module_name = data.get("module")
