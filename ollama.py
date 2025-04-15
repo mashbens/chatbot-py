@@ -96,7 +96,7 @@ def ask():
     Berikut adalah data dari {keywords}:
     {pdf_text}
     
-    Jawab pertanyaan ini berdasarkan data di atas!, berikan langsung response jawabannya!" 
+    Jawablah sejelas dan seakurat mungkin berdasarkan data di atas. Jangan gunakan informasi lain selain data tersebut.
     
     Pertanyaan: {user_question}
 
